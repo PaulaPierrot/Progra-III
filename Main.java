@@ -1,5 +1,5 @@
-public class Main {
-    public static void main(String[] args) {
+public class Clase1Actividad1 {
+    public static void Clase1Actividad1(String[] args) {
         int [] array = {1,2,3}; //1
         int mayor = 0;  //1
 
