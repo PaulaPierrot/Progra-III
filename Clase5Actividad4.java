@@ -5,7 +5,7 @@ import java.util.*;
 public class Main {
     public static void main(String[] args) {
         int numVertices = 6;  // Número de centros de distribución
-        Dijkstra.Graph grafo = new Dijkstra.Graph(numVertices);
+        Dijkstra.Graph grafo = new Dijkstra.Graph(numVertices); // usa matriz de adyacencia
 
         // Agregar carreteras (aristas) con tiempos de viaje (pesos) entre centros de distribución
         grafo.addEdge(0, 1, 4);  // Desde el centro 0 al 1 con un tiempo de 4 minutos
@@ -42,7 +42,7 @@ public class Dijkstra {
         int vertices;
         List<List<Edge>> adjList;
 
-        Graph(int vertices) {
+        Graph(int vertices) { // crea el grafo vacio 
             this.vertices = vertices;
             adjList = new ArrayList<>(vertices);
             for (int i = 0; i < vertices; i++) {
@@ -50,7 +50,7 @@ public class Dijkstra {
             }
         }
 
-        void addEdge(int source, int target, int weight) {
+        void addEdge(int source, int target, int weight) { 
             adjList.get(source).add(new Edge(target, weight));
             adjList.get(target).add(new Edge(source, weight));  // Carreteras bidireccionales
         }
