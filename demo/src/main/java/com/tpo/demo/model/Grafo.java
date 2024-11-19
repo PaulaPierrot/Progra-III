@@ -33,11 +33,33 @@ public class Grafo {
         Queue<Object> cola = new LinkedList<>();
         visitadoMovies.add(inicio);
         cola.add(inicio);
+
         while (!cola.isEmpty()) {
             Object actual = cola.poll();
+
             if (actual instanceof MovieEntity) {
                 MovieEntity movie = (MovieEntity) actual;
                 resultado.append("Movie: ").append(movie.getTitle()).append("\n");
+
+                // Recorrer actores
+                for (PersonEntity actor : movie.getActors()) {
+                    if (!visitadoPeople.contains(actor)) {
+                        visitadoPeople.add(actor);
+                        resultado.append("Actor: ").append(actor.getName()).append("\n");
+                        cola.add(actor);
+                    }
+                }
+
+                // Recorrer directores
+                for (PersonEntity director : movie.getDirectors()) {
+                    if (!visitadoPeople.contains(director)) {
+                        visitadoPeople.add(director);
+                        resultado.append("Director: ").append(director.getName()).append("\n");
+                        cola.add(director);
+                    }
+                }
+
+                // Recorrer películas asociadas a los actores y directores
                 for (PersonEntity persona : adjMovies.get(movie)) {
                     if (!visitadoPeople.contains(persona)) {
                         visitadoPeople.add(persona);
@@ -46,11 +68,16 @@ public class Grafo {
                 }
             } else if (actual instanceof PersonEntity) {
                 PersonEntity persona = (PersonEntity) actual;
-                System.out.println("Person: " + persona.getName());
-                for (MovieEntity movie : adjPeople.get(persona)) {
-                    if (!visitadoMovies.contains(movie)) {
-                        visitadoMovies.add(movie);
-                        cola.add(movie);
+                if (!visitadoPeople.contains(persona)) {
+                    visitadoPeople.add(persona);
+                    resultado.append("Person: ").append(persona.getName()).append("\n");
+
+                    // Recorrer películas asociadas a la persona
+                    for (MovieEntity movie : adjPeople.get(persona)) {
+                        if (!visitadoMovies.contains(movie)) {
+                            visitadoMovies.add(movie);
+                            cola.add(movie);
+                        }
                     }
                 }
             }
@@ -65,25 +92,43 @@ public class Grafo {
         return resultado.toString();
     }
     // Método recursivo para el recorrido DFS
-    private void dfsRecursivo(Object nodo, StringBuilder resultado,
-                              Set<MovieEntity> visitadoMovies, Set<PersonEntity> visitadoPeople) {
+    private void dfsRecursivo(Object nodo, StringBuilder resultado, Set<MovieEntity> visitadoMovies, Set<PersonEntity> visitadoPeople) {
         if (nodo instanceof MovieEntity) {
             MovieEntity movie = (MovieEntity) nodo;
             if (visitadoMovies.contains(movie)) return; // Evitar ciclos
             visitadoMovies.add(movie);
             resultado.append("Movie: ").append(movie.getTitle()).append("\n");
-            // Llamada recursiva para cada persona (actor o director) conectada a la película
-            for (PersonEntity persona : adjMovies.get(movie)) {
-                dfsRecursivo(persona, resultado, visitadoMovies, visitadoPeople);
+
+            // Recorrer actores
+            for (PersonEntity actor : movie.getActors()) {
+                if (!visitadoPeople.contains(actor)) {
+                    visitadoPeople.add(actor);
+                    resultado.append("Actor: ").append(actor.getName()).append("\n");
+                    dfsRecursivo(actor, resultado, visitadoMovies, visitadoPeople);
+                }
+            }
+
+            // Recorrer directores
+            for (PersonEntity director : movie.getDirectors()) {
+                if (!visitadoPeople.contains(director)) {
+                    visitadoPeople.add(director);
+                    resultado.append("Director: ").append(director.getName()).append("\n");
+                    dfsRecursivo(director, resultado, visitadoMovies, visitadoPeople);
+                }
             }
         } else if (nodo instanceof PersonEntity) {
             PersonEntity persona = (PersonEntity) nodo;
             if (visitadoPeople.contains(persona)) return; // Evitar ciclos
             visitadoPeople.add(persona);
             resultado.append("Person: ").append(persona.getName()).append("\n");
-            // Llamada recursiva para cada película conectada a esta persona
+
+            // Recorrer películas
             for (MovieEntity movie : adjPeople.get(persona)) {
-                dfsRecursivo(movie, resultado, visitadoMovies, visitadoPeople);
+                if (!visitadoMovies.contains(movie)) {
+                    visitadoMovies.add(movie);
+                    resultado.append("Movie: ").append(movie.getTitle()).append("\n");
+                    dfsRecursivo(movie, resultado, visitadoMovies, visitadoPeople);
+                }
             }
         }
     }
